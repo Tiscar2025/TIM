@@ -279,15 +279,15 @@
 
 
 .badge-container {
-  position: relative;
   display: inline-block;
   padding: 10px;
   cursor: pointer;
+  position: relative; /* ensures tooltip is positioned relative to this container */
+  overflow: visible;
 }
 
 .tooltip {
   width: 250px;
-  visibility: hidden;
   position: absolute;
   top: 110%;
   left: 50%;
@@ -297,9 +297,10 @@
   padding: 5px 10px;
   border-radius: 4px;
   text-align: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  /*opacity: 0;*/
+  /*transition: opacity 0.3s ease;*/
   white-space: normal;
+  z-index: 9999;
 }
 
 .tooltip::after {
@@ -317,4 +318,5 @@
 .badge-container:hover .tooltip {
   visibility: visible;
   opacity: 1;
+  z-index: 10000;
 }

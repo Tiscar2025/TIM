@@ -10,12 +10,29 @@ import {BadgeService} from "tim/gamification/badge/badge.service";
     selector: "tim-badge",
     template: `
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <div class="badge-container" [ngClass]="['badge', color, shape]" (click)="openDialog()">
+    <div class="badge-container" [ngClass]="['badge', color, shape]">
+    <div class="circle">
+        <span class="material-symbols-outlined">{{ icon }}</span>
+    </div>
+    <div class="ribbon">{{ title }}</div>
+    <!-- Tooltip for description -->
+        <div class="tooltip" *ngIf="description">
+            
+            <p><b>Description:</b></p>
+            <p>{{ description }}</p>
+            
+            <div *ngIf="message">
+                <p><b>Message:</b></p>
+                <p>{{ message }}</p>
+            </div>
+        </div>
+    </div>    
+    <!--<div class="badge-container" [ngClass]="['badge', color, shape]" (click)="openDialog()">
         <div class="circle">
             <span class="material-symbols-outlined">{{ icon }}</span>
         </div>
         <div class="ribbon">{{ title }}</div>
-    </div>
+    </div> -->
 
   `,
     styleUrls: ["badge.component.scss"],
