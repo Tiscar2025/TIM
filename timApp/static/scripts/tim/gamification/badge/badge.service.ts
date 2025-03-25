@@ -174,15 +174,14 @@ export class BadgeService {
         }
     }
 
-    private dialogOpen = false;
+    public activeDialogRef: any = null; // Store the active dialog reference
 
-    // Tarkistetaan, onko dialogi-ikkuna auki
-    isDialogOpen(): boolean {
-        return this.dialogOpen;
-    }
-    // Asetetaan dialogin tila
-    setDialogOpen(isOpen: boolean): void {
-        this.dialogOpen = isOpen;
+    // Close the active dialog if it exists
+    closeActiveDialog(): void {
+        if (this.activeDialogRef) {
+            this.activeDialogRef.close({}); // Close the current dialog
+            this.activeDialogRef = null; // Reset the reference
+        }
     }
 
     // Funktio updatetapahtuman lähettämiseen kun luodaan uusi badge creatorilla, se päivitetään giver listaan.

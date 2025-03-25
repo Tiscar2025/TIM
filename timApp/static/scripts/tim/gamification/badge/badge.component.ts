@@ -5,6 +5,8 @@ import {FormsModule} from "@angular/forms";
 import {showMessageDialog} from "tim/ui/showMessageDialog";
 import {cons} from "fp-ts/ReadonlyNonEmptyArray";
 import {BadgeService} from "tim/gamification/badge/badge.service";
+import {angularDialog} from "tim/ui/angulardialog/dialog.service";
+import {MessageDialogComponent} from "tim/ui/message-dialog.component";
 
 @Component({
     selector: "tim-badge",
@@ -50,21 +52,30 @@ export class BadgeComponent implements OnInit, OnChanges {
     // hakee dialogServicen BadgeServicesta
     constructor(private dialogService: BadgeService) {}
 
-    // Avaa valitun badgen dialogin yksi ikkuna kerrallaan, josta näkee Descriptionin ja Messagen
     async openDialog(): Promise<void> {
-        if (this.dialogService.isDialogOpen() || this.preventDialog) {
+        if (this.preventDialog) {
+            this.dialogService.closeActiveDialog();
             return;
         }
+        // Close any open dialog
+        this.dialogService.closeActiveDialog();
 
-        this.dialogService.setDialogOpen(true);
+        // Open a new dialog
+        this.dialogService.activeDialogRef = await angularDialog.open(
+            MessageDialogComponent,
+            {
+                message: `
+            <b>${this.title}</b><br><br>
+            <b>Description:</b> ${this.description}<br>
+            <b>Message:</b> ${this.message}
+        `,
+                modal: false,
+            }
+        );
 
-        await showMessageDialog(`
-          <b>${this.title}</b><br><br>
-          <b>Description:</b> ${this.description}<br>
-          <b>Message:</b> ${this.message}
-        `);
-
-        this.dialogService.setDialogOpen(false);
+        // Wait for the dialog to close
+        await this.dialogService.activeDialogRef.result;
+        this.dialogService.activeDialogRef = null; // Reset the reference after closing
     }
 
     ngOnInit(): void {
