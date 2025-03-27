@@ -27,28 +27,28 @@ import {TimUtilityModule} from "tim/ui/tim-utility.module";
 @Component({
     selector: "tim-badge-creator",
     template: `
-        <ng-container *ngIf="this.hasPermission; else noPermissionView">
-        <div class="badge-creator" [formGroup]="badgeForm">
-          <fieldset class="form-fieldset">
-            <div class="all_badges">
-                <fieldset>
-                  <h2>{{ selectedContextGroup ? "All Badges (" + selectedContextGroup + ")" : "All Badges" }}</h2>
-                  <div class="badge_view">
-                      <ng-container *ngIf="all_badges.length == 0">
-                          <p>No badges</p>
-                      </ng-container>
-                      <ng-container *ngIf="all_badges.length > 0">
-                          <div class="badge-card" *ngFor="let badge of all_badges">
-                            <tim-badge
-                               [ngClass]="{'selected-badge': clickedBadge === badge}"
-                                       title="{{badge.title}}"
-                                       color="{{badge.color}}"
-                                       shape="{{badge.shape}}"
-                                       [image]="badge.image"
-                                       description="{{badge.description}}"
-                                       [preventDialog]="true"
-                                       (click)="selectBadge(badge);">
-                            </tim-badge>
+            <ng-container *ngIf="this.hasPermission; else noPermissionView">
+            <div class="badge-creator" [formGroup]="badgeForm">
+              <fieldset class="form-fieldset">
+                <div class="all_badges">
+                    <fieldset>
+                      <h2>{{ selectedContextGroup ? "All Badges (" + selectedContextGroup + ")" : "All Badges" }}</h2>
+                      <div class="badge_view">
+                          <ng-container *ngIf="all_badges.length == 0">
+                              <p>No badges</p>
+                          </ng-container>
+                          <ng-container *ngIf="all_badges.length > 0">
+                              <div class="badge-card" *ngFor="let badge of all_badges">
+                                <tim-badge
+                                   [ngClass]="{'selected-badge': clickedBadge === badge}"
+                                           title="{{badge.title}}"
+                                           color="{{badge.color}}"
+                                           shape="{{badge.shape}}"
+                                           [image]="badge.image"
+                                           description="{{badge.description}}"
+                                           [preventDialog]="true"
+                                           (click)="selectBadge(badge);">
+                                </tim-badge>
                           </div>
                   </ng-container>
                   </div>

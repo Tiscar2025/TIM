@@ -10,23 +10,29 @@ import {BadgeService} from "tim/gamification/badge/badge.service";
     selector: "tim-badge",
     template: `
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <div class="badge-container" [ngClass]="['badge', color, shape]">
+    <ng-container *ngIf="this.hasPermission; else noPermissionView">
+  <div class="badge-container" [ngClass]="['badge', shape, color]">
     <div class="circle">
-        <span class="material-symbols-outlined">{{ icon }}</span>
+      <span class="material-symbols-outlined">{{ icon }}</span>
     </div>
     <div class="ribbon">{{ title }}</div>
     <!-- Tooltip for description -->
-        <div class="tooltip" *ngIf="description">
-            
-            <p><b>Description:</b></p>
-            <p>{{ description }}</p>
-            
-            <div *ngIf="message">
-                <p><b>Message:</b></p>
-                <p>{{ message }}</p>
-            </div>
-        </div>
-    </div>    
+    <div class="tooltip" *ngIf="description">
+      <p><b>Description:</b></p>
+      <p>{{ description }}</p>
+
+      <div *ngIf="message">
+        <p><b>Message:</b></p>
+        <p>{{ message }}</p>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #noPermissionView>
+  <p>You do not have permission to view this badge.</p>
+</ng-template>
+
     <!--<div class="badge-container" [ngClass]="['badge', color, shape]" (click)="openDialog()">
         <div class="circle">
             <span class="material-symbols-outlined">{{ icon }}</span>
@@ -46,6 +52,7 @@ export class BadgeComponent implements OnInit, OnChanges {
     @Input() description?: string;
     @Input() message?: string;
     @Input() preventDialog: boolean = false;
+    @Input() hasPermission: boolean = true;
 
     icon?: string;
 

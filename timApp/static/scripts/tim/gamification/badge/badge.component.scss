@@ -278,16 +278,17 @@
 }
 
 
-.badge-container {
-  display: inline-block;
-  padding: 10px;
-  cursor: pointer;
-  position: relative; /* ensures tooltip is positioned relative to this container */
-  overflow: visible;
+/* Asetetaan badge-container ja sen vanhemmat elementit samalle tasolle */
+.badge-container,
+.badge-container * {
+  position: relative;
+  z-index: 1;
 }
 
+/* Tooltipin tyylit */
 .tooltip {
   width: 250px;
+  visibility: hidden;
   position: absolute;
   top: 110%;
   left: 50%;
@@ -297,26 +298,14 @@
   padding: 5px 10px;
   border-radius: 4px;
   text-align: center;
-  /*opacity: 0;*/
-  /*transition: opacity 0.3s ease;*/
+  opacity: 0;
+  transition: opacity 0.3s ease;
   white-space: normal;
-  z-index: 9999;
+  z-index: 10; /* Varmistetaan, että tooltip on muiden elementtien päällä */
 }
 
-.tooltip::after {
-    content: " ";
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent rgba(0, 0, 0, 0.85) transparent;
-}
-
-/* Show the tooltip when hovering over the badge */
+/* Näytetään tooltip hover-tilassa */
 .badge-container:hover .tooltip {
   visibility: visible;
   opacity: 1;
-  z-index: 10000;
 }
