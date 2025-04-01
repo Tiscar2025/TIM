@@ -68,6 +68,10 @@ export class BadgeComponent implements OnInit, OnChanges {
             <b>${this.title}</b><br><br>
             <b>Description:</b> ${this.description}<br>
             <b>Message:</b> ${this.message}
+            <b>Color:</b> ${this.color}
+            <b>Icon:</b> ${this.icon}
+            <b>Shape:</b> ${this.shape}
+            
         `,
                 modal: false,
             }
