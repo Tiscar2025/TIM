@@ -83,6 +83,7 @@ export class GroupNameComponent implements OnInit {
                 this.item.name
             );
         }
+        window.location.reload();
         return "Name successfully changed to: " + this.groupName;
     }
 
