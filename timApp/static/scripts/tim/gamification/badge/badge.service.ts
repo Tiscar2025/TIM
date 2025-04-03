@@ -10,6 +10,7 @@ import type {
     IPersonalGroup,
 } from "tim/gamification/badge/badge.interface";
 import {documentglobals} from "tim/util/globals";
+import {IFolder, IFullDocument} from "tim/item/IItem";
 
 interface IData {
     given_by: number;

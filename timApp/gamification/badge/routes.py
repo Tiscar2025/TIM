@@ -7,6 +7,7 @@ from urllib import request
 from flask import Response, current_app
 from sqlalchemy import select, or_
 
+from timApp.answer.pointsumrule import Group
 from timApp.auth.accesshelper import (
     AccessDenied,
     verify_teacher_access,
@@ -760,18 +761,20 @@ def usergroups_members(doc_id: int, usergroup_name: str) -> Response:
     return json_response(sorted(list(usergroup.users), key=attrgetter("real_name")))
 
 
-@badges_blueprint.get("/current_group_name/<name>")
+@badges_blueprint.get("/current_group_name/<group_name>")
 # TODO: päätä, käytetäänkö returnissa .human_namea, joka hakee vain descriptionin, ei id:tä
-def group_name(name: str):
+def group_name(name: str) -> Response:
     """
     Fetches group name from the database.
+    :param name:
+    :param group_id:
     :param name: Name of the group given in group changer
     :return: group name
     """
-    group = UserGroup.get_by_name(name)
-    if group:
-        return json_response(group)
-    return error_generic("there's no group with name: " + name, 404)
+    ans = UserGroup.get_by_name(name)
+    if ans:
+        return json_response(ans.human_name)
+    return error_generic("there's no group with such name", 404)
 
 
 @badges_blueprint.post("/update_group_name")

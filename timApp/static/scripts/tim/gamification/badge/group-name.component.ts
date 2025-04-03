@@ -21,7 +21,7 @@ import {IFolder, IFullDocument} from "tim/item/IItem";
     template: `
         <ng-container>
             <div class="current">
-                <p>Current group name: <b>{{ showFullName ? groupName : subGroup }}</b></p>
+                <p>Current group name: <b>{{ showFullName ? groupName : subGroup || 'No group name available' }}</b></p>
             </div>
             <div class="changeName">
                 <button (click)="toggleFullName()">Toggle parent group</button>
@@ -51,30 +51,7 @@ export class GroupNameComponent implements OnInit {
 
     constructor(private badgeService: BadgeService) {}
 
-    /**
-     * TODO: Kommentoitu koodin pätkä toimii, jos routes.py:ssä käytetään returnissa .human_name
-     */
-    async getGroupName() {
-        if (this.group) {
-            const fetchedGroupName = await this.badgeService.getCurrentGroup(
-                this.group
-            );
-            if (fetchedGroupName) {
-                this.groupName = fetchedGroupName.name;
-                this.group_id = fetchedGroupName.id; //Jos käytetään human_name(), ei saada ID:tä
-                console.log(fetchedGroupName);
-            }
-            /*
-            if (fetchedGroupName) {
-                this.groupName = fetchedGroupName; // toimii, kun routessa .human_name()
-                //this.group_id = fetchedGroupName.id; //Jos käytetään human_name(), ei saada ID:tä
-                console.log(fetchedGroupName);
-            }
-             */
-        }
-        this.parseParentGroup(this.groupName);
-    }
-    parseParentGroup(groupName: string | null) {
+    parseParentGroup() {
         if (!this.groupName) return;
         const nameParts = this.groupName.split("-");
         this.parentGroup = nameParts[0];
@@ -98,8 +75,9 @@ export class GroupNameComponent implements OnInit {
         }
 
         if (this.item) {
-            //console.log(this.item.id);
-            //console.log(this.item.name);
+            if (this.groupName != null) {
+                this.item.name = this.groupName;
+            }
             await this.badgeService.updateGroupName(
                 this.item.id,
                 this.item.name
@@ -109,14 +87,16 @@ export class GroupNameComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        console.log(
-            "ngOnInit - group:",
-            this.group,
-            "username:",
-            this.username
-        );
         this.item = manageglobals().curr_item;
-        this.getGroupName();
+        this.group = this.item.title; // this.item.name on sivun "short title" sivun asetuksissa
+        console.log("Group name: ", this.item.title, "\nid: ", this.item.id);
+
+        this.groupName = this.group;
+        console.log("Oikeesti se nimi on ", this.groupName);
+        this.parseParentGroup(); // Ensure subGroup and parentGroup are set
+
+        console.log("Parsed Group Name: ", this.groupName);
+        console.log("SubGroup: ", this.subGroup);
     }
 }
 
