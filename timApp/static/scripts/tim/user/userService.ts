@@ -1,5 +1,6 @@
 import {showMessageDialog} from "tim/ui/showMessageDialog";
 import type {Locale} from "tim/util/globals";
+import {isDocumentGlobals} from "tim/util/globals";
 import {genericglobals} from "tim/util/globals";
 import {$http} from "tim/util/ngimport";
 import type {ToReturn} from "tim/util/utils";
@@ -141,7 +142,14 @@ export class UserService {
     }
 
     private getIsInAnswerReviewImpl() {
-        const curr_item = genericglobals().curr_item;
+        const g = genericglobals();
+        if (
+            isDocumentGlobals(g) &&
+            g.docSettings.disable_answer !== "answer_review"
+        ) {
+            return false;
+        }
+        const curr_item = g.curr_item;
         if (!curr_item || !isTaggedItem(curr_item)) {
             return false;
         }
@@ -155,7 +163,7 @@ export class UserService {
                 .map((tag) => tag.name)
         );
         const groupReviewTags = this.current.groups.map(
-            (g) => `answer_review_group:${g.name}`
+            (ug) => `answer_review_group:${ug.name}`
         );
         const res = groupReviewTags.some((tag) => activeTags.has(tag));
         // console.log(activeTags, groupReviewTags, res);

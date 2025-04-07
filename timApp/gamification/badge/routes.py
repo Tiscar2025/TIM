@@ -6,6 +6,7 @@ from urllib import request
 
 from flask import Response, current_app
 from sqlalchemy import select, or_
+from wtforms.widgets.core import Select
 
 from timApp.auth.accesshelper import (
     AccessDenied,
@@ -548,14 +549,14 @@ def get_groups_badges(group_id: int, context_group: str) -> Response:
 
 
 # TODO: Handle errors.
-@badges_blueprint.get("/badge_holders/<badge_id>")
-def get_badge_holders(badge_id: int) -> Response:
+@badges_blueprint.get("/badge_given/<badge_id>")
+def get_badge_given(badge_id: int) -> Response:
     """
     Fetches holders of given badges.
     :param badge_id: ID of the badge
     :return: Badgegivens in json response format
     """
-    badge_holders = (
+    badge_given = (
         run_sql(
             select(BadgeGiven)
             .filter(BadgeGiven.active)
@@ -564,7 +565,34 @@ def get_badge_holders(badge_id: int) -> Response:
         .scalars()
         .all()
     )
-    return json_response(badge_holders)
+    return json_response(badge_given)
+
+
+# TODO: Do access right checks.
+@badges_blueprint.get("/badge_holders/<badge_id>")
+def get_badge_holders(badge_id: int) -> Response:
+    """
+    Fetches all usergroups that holds certain badge.
+    :param badge_id: Badge ID
+    :return: list of usergroups in json format
+    """
+    badges_given = (
+        run_sql(
+            select(BadgeGiven).filter(
+                BadgeGiven.badge_id == badge_id, BadgeGiven.active
+            )
+        )
+        .scalars()
+        .all()
+    )
+    group_ids = []
+    for badge_given in badges_given:
+        group_ids.append(badge_given.group_id)
+    unique_group_ids = list(set(group_ids))
+    user_groups = []
+    for unique_group_id in unique_group_ids:
+        user_groups.append(UserGroup.get_by_id(unique_group_id))
+    return json_response(user_groups)
 
 
 # TODO: Handle errors.
@@ -646,6 +674,46 @@ def withdraw_badge(
                 "event": "withdraw_badge",
                 "timestamp": badge_given["withdrawn"],
                 "id": badge_given_id,
+                "executor": badge_given["withdrawn_by"],
+                "active": badge_given["active"],
+            }
+        )
+    return ok_response()
+
+
+# TODO: Handle errors.
+@badges_blueprint.post("/withdraw_all_badges")
+def withdraw_all_badges(
+    badge_id: int, usergroup_id: int, withdrawn_by: int, context_group: str
+) -> Response:
+    """
+    Withdraws all badges of given ID from a usergroup.
+    :param usergroup_id: ID of the usergroup
+    :param context_group: Context group where the badge is included
+    :param badge_id: ID of the badge
+    :param withdrawn_by: ID of the useraccount that withdraws the badge
+    :return: ok response
+    """
+    d = DocEntry.find_by_path(f"groups/{context_group}")
+    if not d:
+        raise NotExist()
+    verify_teacher_access(d)
+    badge_given = {
+        "active": False,
+        "withdrawn_by": withdrawn_by,
+        "withdrawn": datetime_tz.now(),
+    }
+    BadgeGiven.query.filter(
+        BadgeGiven.badge_id == badge_id, BadgeGiven.group_id == usergroup_id
+    ).update(badge_given)
+    db.session.commit()
+    if current_app.config["BADGE_LOG_FILE"]:
+        log_badge_event(
+            {
+                "event": "withdraw_all_badges",
+                "timestamp": badge_given["withdrawn"],
+                "badge_id": badge_id,
+                "usergroup_id": usergroup_id,
                 "executor": badge_given["withdrawn_by"],
                 "active": badge_given["active"],
             }
@@ -809,8 +877,18 @@ def group_name(name: str):
     :return: group name
     """
     group = UserGroup.get_by_name(name)
+    doc = group.admin_doc
+    if not doc:
+        raise error_generic("no rights", 404)
+    pretty_name = doc.description
     if group:
-        return json_response(group)
+        return json_response(
+            {
+                "id": group.id,
+                "name": group.name,
+                "description": pretty_name,  # Add this line
+            }
+        )
     return error_generic("there's no group with name: " + name, 404)
 
 

@@ -8,6 +8,7 @@ from typing import Any, TypedDict, Sequence, Tuple
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from flask import render_template_string, Response, send_file
+from flask_babel import gettext
 from marshmallow.utils import missing
 from openpyxl import Workbook
 from openpyxl.writer.excel import ExcelWriter
@@ -452,7 +453,7 @@ def check_field_filtering(
 @use_args(GenerateSpreadSheetSchema())
 def gen_csv_legacy(args: GenerateSpreadSheetModel) -> Response | str:
     """Legacy route for documents that have direct links to the route."""
-    return gen_spreadsheet(args)
+    return gen_spreadsheet_impl(args)
 
 
 @tableForm_plugin.get("/generateReport")
@@ -463,6 +464,10 @@ def gen_spreadsheet(args: GenerateSpreadSheetModel) -> Response | str:
     # TODO: generic, move
     :return: SpreadSheet in CSV or .xlsx format containing header row and rows for users and values
     """
+    return gen_spreadsheet_impl(args)
+
+
+def gen_spreadsheet_impl(args: GenerateSpreadSheetModel) -> Response | str:
     curr_user = get_current_user_object()
     (
         docid,
@@ -512,11 +517,11 @@ def gen_spreadsheet(args: GenerateSpreadSheetModel) -> Response | str:
     )
     data: list[list[str | float | None]] = [[]]
     if show_real_names:
-        data[0].append("Real name")
+        data[0].append(gettext("Real name"))
     if show_user_names:
-        data[0].append("Username")
+        data[0].append(gettext("Username"))
     if show_emails:
-        data[0].append("email")
+        data[0].append(gettext("Email"))
     tmp: Sequence[str | float | None] = r["fields"]
     data[0] = data[0] + list(tmp)
     if len(filter_fields) != len(filter_values):
@@ -630,7 +635,7 @@ def save_workbook_to_memory(wb: Workbook) -> io.BytesIO:
 
 def parse_row(rd: list[str | float | None], regex_filter: re.Pattern) -> None:
     for i in range(len(rd)):
-        m = regex_filter.match(rd[i]) if rd[i] else None
+        m = regex_filter.match(str(rd[i])) if rd[i] is not None else None
         if m:
             val = m.group(0)
             val = val.replace(" ", "")

@@ -9,6 +9,7 @@ extend-exclude = [
     "*.patch",
     "*.min.js",
     "*-min.js",
+    "timApp/templates/base.jinja2",
     "timApp/static/scripts/vendor/",
     "timApp/static/ohj1/",
     "timApp/modules/cs/static/ohj2/",
@@ -63,6 +64,10 @@ Versio = "Versio"
 MATA280 = "MATA280"
 selectin = "selectin"
 braket = "braket"
+ND = "ND"
+T3Pbw_JAT4jzxiFC47fCT9kChSyZpNDFmosuCA8Y6WE = "T3Pbw_JAT4jzxiFC47fCT9kChSyZpNDFmosuCA8Y6WE"
+T3Pbw_ = "T3Pbw_"
+JAT4jzxiFC47fCT9kChSyZpNDFmosuCA8Y6WE = "JAT4jzxiFC47fCT9kChSyZpNDFmosuCA8Y6WE"
 
 [default.extend-words]
 # Custom corrections:
