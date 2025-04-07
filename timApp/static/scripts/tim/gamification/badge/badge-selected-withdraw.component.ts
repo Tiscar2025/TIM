@@ -249,25 +249,6 @@ export class BadgeSelectedWithdrawComponent implements OnInit {
         // this.fetchUsers(group.name);
     }
 
-    /**
-     * Hakee käyttäjät, jotka kuuluvat badgegroupContext ryhmään. badgegroupContext annetaan TIM:n puolelta.
-     */
-    async fetchUsers(groupContext?: string) {
-        if (groupContext) {
-            this.users = await this.badgeService.getUsersFromGroup(
-                groupContext
-            );
-        }
-    }
-
-    async fetchGroups() {
-        if (this.badgegroupContext) {
-            this.groups = await this.badgeService.getSubGroups(
-                this.badgegroupContext
-            );
-        }
-    }
-
     async fetchUsersFromGroups() {
         this.groupUsersMap.clear();
         for (const group of this.groups) {
