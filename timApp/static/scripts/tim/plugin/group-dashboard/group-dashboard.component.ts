@@ -103,15 +103,16 @@ export class GroupDashboardComponent implements OnInit {
     totalBadges: number = 0;
 
     //TODO: show the course that the group is participating in
-    //TODO: look for ways to fecth points from courses' excerice page and display them
+    //TODO: look for ways to fetch points from courses' exercise page and display them
     async ngOnInit(): Promise<void> {
+        this.item = manageglobals().curr_item;
         if (this.group) {
             await this.getGroupName();
             await this.fetchMembers();
             await this.fetchUserBadges();
             await this.fetchGroupBadges();
+            await this.fetchPoints();
         }
-        this.item = manageglobals().curr_item;
     }
 
     async getGroupName() {
@@ -177,6 +178,13 @@ export class GroupDashboardComponent implements OnInit {
         } catch (error) {
             console.error("Error fetching group mutual badges:", error);
         }
+    }
+
+    //TODO: miten saadaan osoittamaan haluttuun dokumenttiin? Hae tehtävä dokumenttia reitillä?
+    async fetchPoints() {
+        const points = await this.groupService.getTargetDocumentPoints(
+            this.item?.path
+        );
     }
 
     onContextGroupChange(context: string) {
