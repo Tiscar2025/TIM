@@ -102,8 +102,8 @@ export class GroupDashboardComponent implements OnInit {
     totalMembers: number = 0;
     totalBadges: number = 0;
 
-    //TODO: total badges in group details
-    //TODO: total members in group
+    //TODO: show the course that the group is participating in
+    //TODO: look for ways to fecth points from courses' excerice page and display them
     async ngOnInit(): Promise<void> {
         if (this.group) {
             await this.getGroupName();
