@@ -181,10 +181,15 @@ export class GroupDashboardComponent implements OnInit {
     }
 
     //TODO: miten saadaan osoittamaan haluttuun dokumenttiin? Hae tehtävä dokumenttia reitillä?
+    // Laske dokumentin pisteet jokaiselta ryhmän jäseneltä ja summaa yhteen
     async fetchPoints() {
         const points = await this.groupService.getTargetDocumentPoints(
-            this.item?.path
+            this.item?.id,
+            this.groupId!
         );
+        if (points) {
+            console.log(points);
+        }
     }
 
     onContextGroupChange(context: string) {

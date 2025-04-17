@@ -124,10 +124,17 @@ export class GroupService {
         }
     }
 
-    async getTargetDocumentPoints(path: string | undefined) {
+    async getTargetDocumentPoints(
+        docId: number | undefined,
+        groupId: number | undefined
+    ) {
         const response = toPromise(
-            this.http.get<any>(`/groups/current_group_name/${path}`)
+            this.http.get<any>(`/groups/points/${docId}/${groupId}`)
         );
-        console.log("Reitti: ", path);
+
+        const result = await response;
+        if (result.ok) {
+            return result.result;
+        }
     }
 }

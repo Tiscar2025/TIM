@@ -553,3 +553,16 @@ def change_group_name(group_name: str, new_name: str) -> Response:
     return json_response(
         {"id": usergroup.id, "name": usergroup.name, "description": doc.description}
     )
+
+
+@groups.get("/points/<doc_id>/<group_id>")
+def get_points_from_doc(doc_id: int, group_id: int) -> Response:
+    group = UserGroup.get_by_id(group_id)
+    doc = DocInfo.find_by_id(doc_id)
+    path = doc.path
+    result = {
+        "group": group.name,
+        "doc": doc.title,
+        "path": path,
+    }
+    return json_response(result)
