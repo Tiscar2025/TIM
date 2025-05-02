@@ -217,6 +217,7 @@ TIM_SAFE_ATTRS = frozenset(
         "plugin",
         "json",
         "plugin-type",
+        "eagerly-load-state",
         "data-answer-id",
         "answer-id",
         "task-id",
@@ -261,6 +262,10 @@ TIM_SAFE_ATTRS = frozenset(
         "unauthorized-text",
         "unsaved-changes-text",
         "wait-text",
+        "poll-interval",
+        "poll-text",
+        "show-direct-link-timeout",
+        "direct-link-text",
         # viz and vars:
         "usercode",
         "vizcmd",

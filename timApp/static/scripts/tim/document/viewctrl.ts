@@ -1,4 +1,4 @@
-import type {IController, IPromise, IScope} from "angular";
+import type {IController, IHttpResponse, IPromise, IScope} from "angular";
 import $ from "jquery";
 import {timApp} from "tim/app";
 import {setActiveDocument} from "tim/document/activedocument";
@@ -108,6 +108,7 @@ export interface IDocumentViewInfoStatus {
     can_access: boolean;
     right?: IRight;
     global_message?: string;
+    is_logged_in: boolean;
 }
 
 export interface ITimComponent extends IUnsavedComponent {
@@ -459,6 +460,26 @@ export class ViewCtrl implements IController {
 
         if (this.docViewInfoPollInterval) {
             void this.startDocumentStatePolling();
+
+            if (dg.docSettings.redirectAnonymousNoRight) {
+                const url = new URL(
+                    dg.docSettings.redirectAnonymousNoRight,
+                    window.location.href
+                );
+                // Only allow redirecting to the same domain for now
+                if (url.hostname === window.location.hostname) {
+                    this.listen("docViewInfoUpdate", (s) => {
+                        if (!s.is_logged_in && !s.can_access) {
+                            // Disable any confirmation on exit
+                            window.addEventListener("beforeunload", (e) => {
+                                e.returnValue = "";
+                                return "";
+                            });
+                            window.location.href = url.href;
+                        }
+                    });
+                }
+            }
         }
 
         this.defaultAction =
@@ -482,7 +503,10 @@ export class ViewCtrl implements IController {
 
         // Check against statePollInterval to allow stopping the polling
         while (this.docViewInfoPollInterval) {
-            const r = await to(
+            const r = await to<
+                IHttpResponse<IDocumentViewInfoStatus>,
+                {data: IDocumentViewInfoStatus; status?: number}
+            >(
                 $http.get<IDocumentViewInfoStatus>(`/docViewInfo/${docPath}`, {
                     params: {
                         require_valid_session: false,
@@ -490,7 +514,8 @@ export class ViewCtrl implements IController {
                 })
             );
 
-            if (r.ok) {
+            // docViewInfo returns 403 to signal missing access, but still returns the info
+            if (r.ok || r.result.status === 403) {
                 this.emit("docViewInfoUpdate", r.result.data);
             }
 
